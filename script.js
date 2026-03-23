@@ -4,37 +4,51 @@ const tokenize = (str) => str.replace(/\(/g, ' ( ').replace(/\)/g, ' ) ').trim()
 
 const getPrecedence = (op) => ({ '+': 1, '-': 1, '*': 2, '/': 2 }[op] || 0);
 
-const toPostfix = (tokens) => {
-    const output = [];
-    const stack = [];
-    tokens.forEach(token => {
-        if (!isNaN(token) || token === 'x') output.push(token);
-        else if (token === '(') stack.push(token);
-        else if (token === ')') {
-            while (stack.length && stack[stack.length - 1] !== '(') output.push(stack.pop());
-            stack.pop();
-        } else {
-            while (stack.length && getPrecedence(stack[stack.length - 1]) >= getPrecedence(token)) {
-                output.push(stack.pop());
-            }
-            stack.push(token);
-        }
-    });
-    return [...output, ...stack.reverse()];
+const processClosingParenthesis = (tokens, output, stack) => {
+    const top = stack[stack.length - 1];
+    if (top === '(') return toPostfix(tokens, output, stack.slice(0, -1));
+    return processClosingParenthesis(tokens, [...output, top], stack.slice(0, -1));
 };
 
-const buildExpressionTree = (postfix) => {
-    const stack = [];
-    postfix.forEach(token => {
-        if (!isNaN(token) || token === 'x') {
-            stack.push(createNode(token));
-        } else {
-            const right = stack.pop();
-            const left = stack.pop();
-            stack.push(createNode(token, left, right));
-        }
-    });
-    return stack[0];
+const processOperator = (token, tokens, output, stack) => {
+    if (stack.length === 0) return toPostfix(tokens, output, [...stack, token]);
+    const top = stack[stack.length - 1];
+    if (top !== '(' && getPrecedence(top) >= getPrecedence(token)) {
+        return processOperator(token, tokens, [...output, top], stack.slice(0, -1));
+    }
+    return toPostfix(tokens, output, [...stack, token]);
+};
+
+const toPostfix = (tokens, output = [], stack = []) => {
+    if (tokens.length === 0) {
+        if (stack.length === 0) return output;
+        return toPostfix(tokens, [...output, stack[stack.length - 1]], stack.slice(0, -1));
+    }
+
+    const token = tokens[0];
+    const restTokens = tokens.slice(1);
+
+    if (!isNaN(token) || token === 'x') return toPostfix(restTokens, [...output, token], stack);
+    if (token === '(') return toPostfix(restTokens, output, [...stack, token]);
+    if (token === ')') return processClosingParenthesis(restTokens, output, stack);
+    
+    return processOperator(token, restTokens, output, stack);
+};
+
+const buildExpressionTree = (postfix, stack = []) => {
+    if (postfix.length === 0) return stack[0];
+    
+    const token = postfix[0];
+    const rest = postfix.slice(1);
+    
+    if (!isNaN(token) || token === 'x') {
+        return buildExpressionTree(rest, [...stack, createNode(token)]);
+    } else {
+        const right = stack[stack.length - 1];
+        const left = stack[stack.length - 2];
+        const newStack = stack.slice(0, -2);
+        return buildExpressionTree(rest, [...newStack, createNode(token, left, right)]);
+    }
 };
 
 const insertBST = (node, value) => {
@@ -56,6 +70,18 @@ const evaluate = (node, xValue) => {
         case '/': return leftVal / rightVal;
         default: return 0;
     }
+};
+
+const evaluateListRecursive = (nums, tree, index = 0) => {
+    if (index === nums.length) return [];
+    const currentResult = evaluate(tree, nums[index]);
+    return [currentResult, ...evaluateListRecursive(nums, tree, index + 1)];
+};
+
+const buildBstRecursive = (results, node = null, index = 0) => {
+    if (index === results.length) return node;
+    const updatedNode = insertBST(node, results[index]);
+    return buildBstRecursive(results, updatedNode, index + 1);
 };
 
 const findMin = (node) => (node.left ? findMin(node.left) : node);
@@ -85,31 +111,32 @@ const renderTreeHtml = (node) => {
     if (node.left || node.right) {
         const leftChild = node.left ? renderTreeHtml(node.left) : '<div class="node-val invisible-node"></div>';
         const rightChild = node.right ? renderTreeHtml(node.right) : '<div class="node-val invisible-node"></div>';
-        
-        childrenHtml = `
-            <ul>
-                <li>${leftChild}</li>
-                <li>${rightChild}</li>
-            </ul>
-        `;
+        childrenHtml = `<ul><li>${leftChild}</li><li>${rightChild}</li></ul>`;
     }
     
     return `<div class="node-val">${node.value}</div>${childrenHtml}`;
 };
 
+const parseNumbersRecursive = (strArray, index = 0) => {
+    if (index === strArray.length) return [];
+    return [parseFloat(strArray[index].trim()), ...parseNumbersRecursive(strArray, index + 1)];
+};
+
 function processData() {
     const numsStr = document.getElementById('numbersInput').value;
-    if (!numsStr.trim()) return alert("Ingresa una lista de números");
+    if (!numsStr.trim()) return alert("Ingresa una lista de números separada por comas");
     
-    const nums = numsStr.split(',').map(n => parseFloat(n.trim()));
+    const numsArray = numsStr.split(',');
+    const nums = parseNumbersRecursive(numsArray);
+    
     const expStr = document.getElementById('expressionInput').value;
+    const tokens = tokenize(expStr);
     
-    const postfix = toPostfix(tokenize(expStr));
+    const postfix = toPostfix(tokens);
     const expTree = buildExpressionTree(postfix);
     
-    const results = nums.map(n => evaluate(expTree, n));
-    
-    resultsTreeRoot = results.reduce((acc, curr) => insertBST(acc, curr), null);
+    const results = evaluateListRecursive(nums, expTree);
+    resultsTreeRoot = buildBstRecursive(results);
     
     if(expTree) {
         document.getElementById('expressionTreeCanvas').innerHTML = `<div class="css-tree"><ul><li>${renderTreeHtml(expTree)}</li></ul></div>`;
