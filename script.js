@@ -1,12 +1,9 @@
-// --- MODELO DE DATOS (Nodos inmutables) ---
 const createNode = (value, left = null, right = null) => ({ value, left, right });
 
-// --- 1. PROCESAMIENTO DE EXPRESIONES ---
 const tokenize = (str) => str.replace(/\(/g, ' ( ').replace(/\)/g, ' ) ').trim().split(/\s+/);
 
 const getPrecedence = (op) => ({ '+': 1, '-': 1, '*': 2, '/': 2 }[op] || 0);
 
-// Shunting-yard simplificado (Infix a Postfix)
 const toPostfix = (tokens) => {
     const output = [];
     const stack = [];
@@ -26,7 +23,6 @@ const toPostfix = (tokens) => {
     return [...output, ...stack.reverse()];
 };
 
-// --- 2. CONSTRUCCIÓN DE ÁRBOLES ---
 const buildExpressionTree = (postfix) => {
     const stack = [];
     postfix.forEach(token => {
@@ -41,14 +37,12 @@ const buildExpressionTree = (postfix) => {
     return stack[0];
 };
 
-// Inserción recursiva en Árbol Binario de Búsqueda (BST)
 const insertBST = (node, value) => {
     if (!node) return createNode(value);
     if (value < node.value) return { ...node, left: insertBST(node.left, value) };
     return { ...node, right: insertBST(node.right, value) };
 };
 
-// --- 3. EVALUACIÓN RECURSIVA ---
 const evaluate = (node, xValue) => {
     if (!node.left && !node.right) {
         return node.value === 'x' ? parseFloat(xValue) : parseFloat(node.value);
@@ -64,7 +58,6 @@ const evaluate = (node, xValue) => {
     }
 };
 
-// --- 4. BÚSQUEDA Y ELIMINACIÓN RECURSIVA (BST) ---
 const findMin = (node) => (node.left ? findMin(node.left) : node);
 
 const deleteNode = (node, value) => {
@@ -72,11 +65,9 @@ const deleteNode = (node, value) => {
     if (value < node.value) return { ...node, left: deleteNode(node.left, value) };
     if (value > node.value) return { ...node, right: deleteNode(node.right, value) };
     
-    // Nodo a eliminar encontrado
     if (!node.left) return node.right;
     if (!node.right) return node.left;
     
-    // Caso: Nodo con dos hijos (buscar sucesor inorden)
     const temp = findMin(node.right);
     return { 
         ...node, 
@@ -85,7 +76,6 @@ const deleteNode = (node, value) => {
     };
 };
 
-// --- 5. INTERFAZ Y RENDERIZADO RECURSIVO ---
 let resultsTreeRoot = null;
 
 const renderTreeHtml = (node) => {
@@ -107,7 +97,6 @@ const renderTreeHtml = (node) => {
     return `<div class="node-val">${node.value}</div>${childrenHtml}`;
 };
 
-// --- 6. CONTROLADORES DE EVENTOS ---
 function processData() {
     const numsStr = document.getElementById('numbersInput').value;
     if (!numsStr.trim()) return alert("Ingresa una lista de números");
@@ -118,13 +107,10 @@ function processData() {
     const postfix = toPostfix(tokenize(expStr));
     const expTree = buildExpressionTree(postfix);
     
-    // Mapeo funcional para obtener resultados
     const results = nums.map(n => evaluate(expTree, n));
     
-    // Reducción funcional para construir el BST
     resultsTreeRoot = results.reduce((acc, curr) => insertBST(acc, curr), null);
     
-    // Renderizado en el DOM
     if(expTree) {
         document.getElementById('expressionTreeCanvas').innerHTML = `<div class="css-tree"><ul><li>${renderTreeHtml(expTree)}</li></ul></div>`;
     }

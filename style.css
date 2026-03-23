@@ -1,4 +1,3 @@
-/* --- CONFIGURACIÓN GENERAL --- */
 body {
     font-family: sans-serif;
     background-color: #f4f4f9;
@@ -73,7 +72,6 @@ button {
     justify-content: center;
 }
 
-/* --- DIBUJO DEL ÁRBOL (CSS PURO) --- */
 .css-tree ul {
     padding-top: 20px; position: relative;
     display: flex; justify-content: center;
@@ -87,7 +85,6 @@ button {
     padding: 20px 10px 0 10px;
 }
 
-/* Líneas conectoras superiores horizontales */
 .css-tree li::before, .css-tree li::after {
     content: ''; position: absolute; top: 0; right: 50%;
     border-top: 2px solid #08285B; 
@@ -98,22 +95,19 @@ button {
     border-left: 2px solid #08285B;
 }
 
-/* Limpieza de líneas para nodos únicos y extremos */
 .css-tree li:only-child::after, .css-tree li:only-child::before { display: none; }
 .css-tree li:only-child { padding-top: 0;}
 .css-tree li:first-child::before, .css-tree li:last-child::after { border: 0 none; }
 .css-tree li:last-child::before { border-right: 2px solid #08285B; border-radius: 0 6px 0 0; }
 .css-tree li:first-child::after { border-radius: 6px 0 0 0; }
 
-/* Línea conectora vertical hacia abajo desde los padres */
 .css-tree ul ul::before {
     content: ''; position: absolute; top: 0; left: 50%;
     border-left: 2px solid #08285B;
     width: 0; height: 20px;
-    transform: translateX(-1px); /* Centrado perfecto de la línea */
+    transform: translateX(-1px); 
 }
 
-/* Estilo de las esferas (Nodos) */
 .css-tree .node-val {
     border: 2px solid #08285B; 
     color: white;
@@ -139,7 +133,6 @@ button {
     cursor: default;
 }
 
-/* Nodos invisibles para mantener el balance visual cuando falta un hijo */
 .invisible-node {
     visibility: hidden;
 }
