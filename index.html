@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluador de Expresiones y Árboles</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Evaluador de Expresiones</h1>
+        
+        <div class="input-section">
+            <input type="text" id="numbersInput" placeholder="Lista de números (ej: 5, 10, 15)">
+            <input type="text" id="expressionInput" placeholder="Expresión (ej: (x + 2) * 3)">
+            <button class="btn-calc" onclick="processData()">Calcular y Construir</button>
+        </div>
+
+        <div class="actions-section">
+            <input type="number" id="deleteNodeInput" placeholder="Valor a eliminar">
+            <button class="btn-del" onclick="handleDelete()">Eliminar del Árbol de Resultados</button>
+        </div>
+
+        <div class="display-area">
+            <div class="panel">
+                <h3>Árbol de Expresión</h3>
+                <div id="expressionTreeCanvas" class="tree-container"></div>
+            </div>
+            <div class="panel">
+                <h3>Árbol de Resultados (BST)</h3>
+                <div id="resultsTreeCanvas" class="tree-container"></div>
+            </div>
+        </div>
+        
+        <div id="resultsList"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

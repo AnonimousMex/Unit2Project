@@ -1,0 +1,145 @@
+/* --- CONFIGURACIÓN GENERAL --- */
+body {
+    font-family: sans-serif;
+    background-color: #f4f4f9;
+    color: #000000; 
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    border-top: 6px solid #08285B; 
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+h1, h3 { color: #08285B; }
+
+.input-section, .actions-section {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+input {
+    padding: 12px; 
+    border-radius: 6px;
+    border: 2px solid #4781FF; 
+    outline: none;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+}
+input:focus { border-color: #8234CF; }
+
+button {
+    padding: 12px 20px;
+    border-radius: 6px; border: none;
+    cursor: pointer; font-weight: bold; color: white;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-calc { background-color: #4FC974; }
+.btn-calc:hover { background-color: #35CBCC; transform: translateY(-2px); }
+
+.btn-del { background-color: #F64E4E; }
+.btn-del:hover { background-color: #D3168F; transform: translateY(-2px); }
+
+.display-area { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 30px; 
+    margin-top: 30px; 
+}
+
+.panel {
+    background: #fafafa;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px dashed #FFBE06;
+}
+
+.tree-container { 
+    overflow-x: auto; 
+    padding: 20px; 
+    min-height: 250px; 
+    display: flex;
+    justify-content: center;
+}
+
+/* --- DIBUJO DEL ÁRBOL (CSS PURO) --- */
+.css-tree ul {
+    padding-top: 20px; position: relative;
+    display: flex; justify-content: center;
+    padding-left: 0; margin: 0;
+}
+
+.css-tree li {
+    float: left; text-align: center;
+    list-style-type: none;
+    position: relative;
+    padding: 20px 10px 0 10px;
+}
+
+/* Líneas conectoras superiores horizontales */
+.css-tree li::before, .css-tree li::after {
+    content: ''; position: absolute; top: 0; right: 50%;
+    border-top: 2px solid #08285B; 
+    width: 50%; height: 20px;
+}
+.css-tree li::after {
+    right: auto; left: 50%;
+    border-left: 2px solid #08285B;
+}
+
+/* Limpieza de líneas para nodos únicos y extremos */
+.css-tree li:only-child::after, .css-tree li:only-child::before { display: none; }
+.css-tree li:only-child { padding-top: 0;}
+.css-tree li:first-child::before, .css-tree li:last-child::after { border: 0 none; }
+.css-tree li:last-child::before { border-right: 2px solid #08285B; border-radius: 0 6px 0 0; }
+.css-tree li:first-child::after { border-radius: 6px 0 0 0; }
+
+/* Línea conectora vertical hacia abajo desde los padres */
+.css-tree ul ul::before {
+    content: ''; position: absolute; top: 0; left: 50%;
+    border-left: 2px solid #08285B;
+    width: 0; height: 20px;
+    transform: translateX(-1px); /* Centrado perfecto de la línea */
+}
+
+/* Estilo de las esferas (Nodos) */
+.css-tree .node-val {
+    border: 2px solid #08285B; 
+    color: white;
+    background-color: #4781FF; 
+    font-weight: bold;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    min-width: 45px; min-height: 45px;
+    padding: 5px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(8, 40, 91, 0.2);
+}
+
+.css-tree .node-val:hover {
+    background-color: #8234CF; 
+    transform: scale(1.15);
+    box-shadow: 0 0 15px #FFBE06; 
+    cursor: default;
+}
+
+/* Nodos invisibles para mantener el balance visual cuando falta un hijo */
+.invisible-node {
+    visibility: hidden;
+}
